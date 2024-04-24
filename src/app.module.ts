@@ -1,5 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from './users/users.module';
+import { CommentsModule } from './comments/comments.module';
+import { ConsoleModule } from './console/console.module';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -12,7 +15,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     entities: ["dist/**/**.entity{.ts,.js}"],
     synchronize: true
 }),
-
+UsersModule,
+CommentsModule,
+ConsoleModule
  ],
 
 })
