@@ -34,7 +34,15 @@ export class CompanyService {
     }
     return company;
   }
-
+//Traer companias por name
+async findByName(name: string): Promise<Company> {
+  const criterio: FindOneOptions = { relations: ['videoGame'], where: { name: name } }
+  const company = await this.companyRepository.findOne(criterio)
+  if (!company) {
+    throw new NotFoundException(`Comapnia con nombre ${name} no encontrada`)
+  }
+  return company;
+}
   //Crear compania
   async create(companyDto: CompanyDto): Promise<Company> {
     try {

@@ -23,7 +23,10 @@ export class VideoGamesController {
   findOne(@Param('id') id: string) {
     return this.videoGamesService.findOne(+id);
   }
-
+  @Get('title/:title')
+  findByName(@Param('title') title: string) {
+    return this.videoGamesService.findByName(title.toLowerCase());
+  }
    @Put(':id')
   update(@Param('id') id: string, @Body() videoGameDto: VideoGameDto) {
     return this.videoGamesService.update(+id, videoGameDto);

@@ -16,7 +16,10 @@ export class CompanyController {
   findAll() {
     return this.companyService.findAll();
   }
-
+  @Get('title/:title')
+  findByName(@Param('title') title: string) {
+    return this.companyService.findByName(title.toLowerCase());
+  }
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.companyService.findOne(+id);

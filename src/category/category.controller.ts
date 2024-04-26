@@ -10,6 +10,7 @@ export class CategoryController {
 
   @Post()
   create(@Body() createCategoryDto: CreateCategoryDto) {
+    console.log('Nuevo usuario creado:', createCategoryDto);
     return this.categoryService.create(createCategoryDto);
   }
 
@@ -17,14 +18,17 @@ export class CategoryController {
   findAll() {
     return this.categoryService.findAll();
   }
-
+  @Get('title/:title')
+  findByName(@Param('title') title: string) {
+    return this.categoryService.findByName(title.toLowerCase());
+  }
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.categoryService.findOne(+id);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() categoryDto: UpdateCategoryDto) {
+  update(@Param('id') id: number, @Body() categoryDto: UpdateCategoryDto) {
     return this.categoryService.update(+id, categoryDto);
   }
 

@@ -32,7 +32,15 @@ private readonly categoryRepository:Repository<Category>) { }
     }
     return videoGame;
   }
-
+//Traer video juegos por name
+async findByName(name: string): Promise<VideoGame> {
+  const criterio: FindOneOptions = { relations: ['categoria','company'], where: { name: name } }
+  const videoGame = await this.videoGameRepository.findOne(criterio)
+  if (!videoGame) {
+    throw new NotFoundException(`Video Juego con nombre: ${name} no encontrado`)
+  }
+  return videoGame;
+}
   //Crear ficha video juego
   async create(/*id: number,*/videoGameDto: VideoGameDto): Promise<VideoGame> {
     try {

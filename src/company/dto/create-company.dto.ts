@@ -1,5 +1,10 @@
+import { IsNumber, IsString } from "class-validator";
+
 export class CompanyDto {
-name: string;
-siteUrl: string;
-videoGameId:number
+    @IsString()
+    name: string;
+    @IsString()
+    siteUrl: string;
+    @IsNumber()
+    videoGameId: number
 }

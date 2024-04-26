@@ -35,7 +35,15 @@ export class CategoryService {
     }
     return category;
   }
-
+//Traer categorias por name
+  async findByName(name: string): Promise<Category> {
+    const criterio: FindOneOptions = { relations: ['videoGame'], where: { name: name } }
+    const category = await this.categoryRepository.findOne(criterio)
+    if (!category) {
+      throw new NotFoundException(`Categoria con nombre ${name} no encontrada`)
+    }
+    return category;
+  }
   //Crear categoria
   async create(/*id: number,*/categoryDto: CreateCategoryDto): Promise<Category> {
     try {
