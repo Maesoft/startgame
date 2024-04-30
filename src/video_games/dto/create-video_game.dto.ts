@@ -9,11 +9,16 @@ export class VideoGameDto {
 
     @IsNumber()
     qualification: number;
+
     @IsString()
     images: string;
+
     @IsNumber()
     categoryId: number;
+
     @IsNumber()
-    userId: number;
     companyId: number;
+
+    @IsNumber()
+    consoleId: number;
 }

@@ -20,11 +20,8 @@ export class CategoryService {
   async findAll(): Promise<Category[]> {
     const criterio: FindManyOptions = { relations: ['videoGame'] };
     const category: Category[] = await this.categoryRepository.find(criterio)
-
-
     return category
   }
-
 
   //Traer categorias por id y su juego asociado
   async findOne(id: number): Promise<Category> {
@@ -35,7 +32,7 @@ export class CategoryService {
     }
     return category;
   }
-//Traer categorias por name
+  //Traer categorias por name
   async findByName(name: string): Promise<Category> {
     const criterio: FindOneOptions = { relations: ['videoGame'], where: { name: name } }
     const category = await this.categoryRepository.findOne(criterio)
@@ -82,7 +79,7 @@ export class CategoryService {
       // Si los campos existen, actualiza los campos necesarios.
       if (categoryDto.name) category.name = categoryDto.name;
       if (categoryDto.videoGameId) videoGame.id = categoryDto.videoGameId;
-      
+
       // Actualiza la asociación con videoGame
       category.videoGame = [videoGame];
 
