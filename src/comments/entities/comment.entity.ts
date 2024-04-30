@@ -7,7 +7,7 @@ export class Comment {
     id:string
     @Column()
     comment:string
-    @ManyToOne(()=>User, user => user.comment)
+    @ManyToOne(()=>User, user => user.comments)
     @JoinColumn()
     user:User
 }

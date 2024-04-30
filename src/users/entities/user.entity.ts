@@ -12,7 +12,7 @@ export class User {
     @Column()
     email: string;
     
-    @Column({length:32})
+    @Column()
     password: string;
     
     @Column({ default: "user" })
@@ -21,6 +21,6 @@ export class User {
     @Column({ type: "timestamp", default: () => 'CURRENT_TIMESTAMP' })
     create_time: Date;
 
-    @OneToMany(()=>Comment, comment => comment)
-    comment:Comment[]
+    @OneToMany(()=>Comment, comments => comments.user)
+    comments:Comment[]
 }

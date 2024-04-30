@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { CommentsModule } from './comments/comments.module';
 import { ConsoleModule } from './console/console.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -17,7 +18,8 @@ import { ConsoleModule } from './console/console.module';
 }),
 UsersModule,
 CommentsModule,
-ConsoleModule
+ConsoleModule,
+AuthModule
  ],
 
 })
