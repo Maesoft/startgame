@@ -1,9 +1,11 @@
-import { IS_LENGTH, IsDate, IsNumber, IsString, Length } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString, Length, Max, MaxLength, Min, MinLength } from "class-validator";
 
 export class CreateConsoleDto {
     @IsString()
+    @IsNotEmpty()
     name:string;
     @IsNumber()
-    @Length(4,4)
+    @Min(1000)
+    @Max(3000)
     year:number;
 }

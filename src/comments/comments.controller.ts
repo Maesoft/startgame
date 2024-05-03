@@ -15,11 +15,17 @@ export class CommentsController {
 
   @Delete(':id')
   //@UseGuards(AuthGuard)
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: number) {
     return this.commentsService.remove(id);
   }
-  @Get(':username')
-  findAllCommentsByUser(username: string) {
-    return this.commentsService.findAllCommentsByUser(username)
+  @Get('users/:id')
+  //@UseGuards(AuthGuard)
+  findAllCommentsByUser(@Param('id') id: number) {
+    return this.commentsService.findAllCommentsByUser(id)
+  }
+  @Get('games/:id')
+  //@UseGuards(AuthGuard)
+  findAllCommentsByGame(@Param('id') id: number) {
+    return this.commentsService.findAllCommentsByGame(id)
   }
 }

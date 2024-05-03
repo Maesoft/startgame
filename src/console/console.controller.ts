@@ -8,18 +8,13 @@ export class ConsoleController {
   constructor(private readonly consoleService: ConsoleService) {}
 
   @Post()
-  create(@Body() createConsoleDto: CreateConsoleDto) {
-    return this.consoleService.create(createConsoleDto);
+  newConsole(@Body() createConsoleDto: CreateConsoleDto) {
+    return this.consoleService.newConsole(createConsoleDto);
   }
 
   @Get()
   findAll() {
     return this.consoleService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.consoleService.findOne(+id);
   }
 
   @Patch(':id')
