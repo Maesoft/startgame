@@ -18,41 +18,62 @@ export class CompanyService {
 
   //Traer todas las companias y sus juegos
   async findAll(): Promise<Company[]> {
-    const criterio: FindManyOptions = { relations: ['videoGame'] };
-    const company: Company[] = await this.companyRepository.find(criterio)
+    try {
+      const criterio: FindManyOptions = { relations: ['videoGame'] };
+      const company: Company[] = await this.companyRepository.find(criterio)
 
 
-    return company
+      return company
+    }
+    catch (error) {
+      throw new HttpException(
+        { status: HttpStatus.NOT_FOUND, error: 'Error en la busqueda de la compania' + error },
+        HttpStatus.NOT_FOUND
+      );
+    }
   }
 
   //Traer companias por id y su juego asociado
   async findOne(id: number): Promise<Company> {
-    const criterio: FindOneOptions = { relations: ['videoGame'], where: { id: id } }
-    const company = await this.companyRepository.findOne(criterio)
-    if (!company) {
-      throw new NotFoundException(`Compania con ID ${id} no encontrada`)
+    try {
+      const criterio: FindOneOptions = { relations: ['videoGame'], where: { id: id } }
+      const company = await this.companyRepository.findOne(criterio)
+      if (!company) {
+        throw new NotFoundException(`Compania con ID ${id} no encontrada`)
+      }
+      return company;
     }
-    return company;
+    catch (error) {
+      throw new HttpException(
+        { status: HttpStatus.NOT_FOUND, error: 'Error en la busqueda de la compania' + error },
+        HttpStatus.NOT_FOUND
+      );
+    }
   }
-//Traer companias por name
-async findByName(name: string): Promise<Company> {
-  const criterio: FindOneOptions = { relations: ['videoGame'], where: { name: name } }
-  const company = await this.companyRepository.findOne(criterio)
-  if (!company) {
-    throw new NotFoundException(`Comapnia con nombre ${name} no encontrada`)
+  //Traer companias por name
+  async findByName(name: string): Promise<Company> {
+    try {
+      const criterio: FindOneOptions = { relations: ['videoGame'], where: { name: name } }
+      const company = await this.companyRepository.findOne(criterio)
+      if (!company) {
+        throw new NotFoundException(`Comapnia con el nombre ${name} no encontrada`)
+      }
+      return company;
+    } catch (error) {
+      throw new HttpException(
+        { status: HttpStatus.NOT_FOUND, error: 'Error en la busqueda de la compania' + error },
+        HttpStatus.NOT_FOUND
+      );
+    }
   }
-  return company;
-}
+
   //Crear compania
   async create(companyDto: CompanyDto): Promise<Company> {
     try {
       // Crear una nueva instancia de Compania con los datos del DTO
       const company = await this.companyRepository.save(new Company(companyDto.name, companyDto.siteUrl))
 
-      // Guardar la nueva compania en la base de datos
-      const companySave = await this.companyRepository.save(company);
-
-      return companySave;
+      return company;
     } catch (error) {
       throw new HttpException(
         { status: HttpStatus.NOT_FOUND, error: 'Error en la creacion de la compania' + error },
@@ -71,13 +92,11 @@ async findByName(name: string): Promise<Company> {
         throw new NotFoundException(`Compania con ID ${id} no encontrada`);
       }
       //Verificar si el video juego existe
+      const videoGame = await this.videoGameRepository.findOne({ where: { id: companyDto.videoGameId}});
+      if (!videoGame) {
+        throw new NotFoundException(`Video Juego con ID: ${companyDto.videoGameId} no encontrado`);
+      }
 
-       // Verifica si videoGame existe.
-       const videoGame = await this.videoGameRepository.findOne({ where: { id: companyDto.videoGameId/*tambien se puede poner clase.profesor.id*/ } });
-       if (!videoGame) {
-         throw new NotFoundException(`Video Juego con ID ${companyDto.videoGameId} no encontrada`);
-       }
- 
       // Si los campos existen, actualiza los campos necesarios.
       if (companyDto.name) company.name = companyDto.name;
       if (companyDto.siteUrl) company.siteUrl = companyDto.siteUrl;
@@ -111,13 +130,12 @@ async findByName(name: string): Promise<Company> {
       }
 
       // Eliminar la asociación con videoGame
-      //Asignar un valor por defecto
-      company.videoGame = null;
+      company.videoGame =null;
 
       // Guardar los cambios en la base de datos
       await this.companyRepository.save(company);
 
-      // Eliminar al profesor
+      // Eliminar la compania
       await this.companyRepository.remove(company);
 
       return company;
