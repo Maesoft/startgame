@@ -1,4 +1,4 @@
-import { IsString, IsNumber } from 'class-validator';
+import { IsString, IsNumber, IsOptional } from 'class-validator';
 
 export class VideoGameDto {
     @IsString()
@@ -13,12 +13,12 @@ export class VideoGameDto {
     @IsString()
     images: string;
 
-    @IsNumber()
+    @IsOptional() 
     categoryId: number;
 
-    @IsNumber()
+    @IsOptional() 
     companyId: number;
 
-    @IsNumber()
+    @IsOptional() 
     consoleId: number;
 }

@@ -9,7 +9,7 @@ export class Company {
     name: string;
     @Column()
     siteUrl: string;
-    @OneToMany(() => VideoGame, (videoGame) => videoGame.company)
+    @OneToMany(() => VideoGame, (videoGame) => videoGame.company,{onDelete: 'CASCADE'})
     videoGame: VideoGame[];
     constructor(name: string, siteUrl: string) {
         this.name = name;
