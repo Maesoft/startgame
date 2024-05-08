@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString, Length, Max, MaxLength, Min, MinLength } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString, Max, Min } from "class-validator";
 
 export class CreateConsoleDto {
     @IsString()

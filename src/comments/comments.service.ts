@@ -30,7 +30,7 @@ export class CommentsService {
     })
     return await this.repositoryComments.save(newComment)
   }
-  
+
   public async findAllCommentsByUser(id: number) {
     const criterio: FindManyOptions = { relations: ['user'], where: { user: { id } } }
     const comments = await this.repositoryComments.find(criterio)
@@ -46,10 +46,9 @@ export class CommentsService {
   }
 
   public async remove(id: number) {
-    const criterio: FindOneOptions = {where: {id}}
+    const criterio: FindOneOptions = { where: { id } }
     const commentFound = this.repositoryComments.findOneBy(criterio)
-    if(!commentFound)throw new NotFoundException('')
+    if (!commentFound) throw new NotFoundException('')
     return this.repositoryComments.delete(criterio)
   }
-
 }

@@ -18,7 +18,7 @@ export class ConsoleController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateConsoleDto: UpdateConsoleDto) {
+  update(@Param('id') id: number, @Body() updateConsoleDto: UpdateConsoleDto) {
     return this.consoleService.update(+id, updateConsoleDto);
   }
 

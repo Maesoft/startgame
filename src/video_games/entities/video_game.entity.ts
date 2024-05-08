@@ -29,7 +29,7 @@ export class VideoGame {
     @JoinColumn()
     company: Company
 
-    @ManyToOne(() => Console, (console) => console.videoGame)
+    @ManyToOne(() => Console, (console) => console.videoGame,{onDelete:'SET NULL'})
     @JoinColumn()
     console: Console
 

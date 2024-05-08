@@ -4,7 +4,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 @Entity('consoles')
 export class Console {
     @PrimaryGeneratedColumn()
-    id: string
+    id: number
 
     @Column({unique:true})
     name: string
@@ -12,6 +12,6 @@ export class Console {
     @Column()
     year: number
 
-    @OneToMany(() => VideoGame, videogame => videogame.console)
+    @OneToMany(() => VideoGame, videogame => videogame.console,{onDelete:'SET NULL'})
     videoGame: VideoGame[]
 }
