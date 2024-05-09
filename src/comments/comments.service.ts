@@ -32,14 +32,14 @@ export class CommentsService {
   }
 
   public async findAllCommentsByUser(id: number) {
-    const criterio: FindManyOptions = { relations: ['user'], where: { user: { id } } }
+    const criterio: FindManyOptions = { relations: ['user','videoGame'], where: { user: { id } } }
     const comments = await this.repositoryComments.find(criterio)
     if (comments.length === 0) throw new NotFoundException(`No comments found for user with ID ${id}`)
     return comments
   }
 
   public async findAllCommentsByGame(id: number) {
-    const criterio: FindManyOptions = { relations: ['videoGame'], where: { videoGame: { id } } }
+    const criterio: FindManyOptions = { relations: ['videoGame', 'user'], where: { videoGame: { id } } }
     const comments = await this.repositoryComments.find(criterio)
     if (comments.length === 0) throw new NotFoundException(`No comments found for videogame with ID ${id}`)
     return comments

@@ -1,12 +1,12 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
-import { error } from 'console';
 import { VideoGame } from './entities/video_game.entity';
 import { VideoGameDto } from './dto/create-video_game.dto';
 import { UpdateVideoGameDto } from './dto/update-video_game.dto';
 import { Category } from 'src/category/entities/category.entity';
 import { Company } from 'src/company/entities/company.entity';
+import { Console } from 'src/console/entities/console.entity';
 
 
 @Injectable()
@@ -16,7 +16,10 @@ export class VideoGameService {
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
     @InjectRepository(Company)
-    private readonly companyRepository: Repository<Company>) { }
+    private readonly companyRepository: Repository<Company>,
+    @InjectRepository(Console)
+    private readonly consoleRepository: Repository<Console>
+  ) { }
 
 
   //Traer todos sus juegos y sus relaciones
@@ -80,6 +83,8 @@ export class VideoGameService {
       const categoria = await this.categoryRepository.findOne({ where: { id: videGameDto.categoryId } })
       //Verificamos si la compania existe
       const company = await this.companyRepository.findOne({ where: { id: videGameDto.companyId } })
+      //Verificamos si la compania existe
+      const consola = await this.consoleRepository.findOne({ where: { id: videGameDto.consoleId} })
       // Si los campos existen, actualiza los campos necesarios.
       if (videGameDto.name) videoGame.name = videGameDto.name
       if (videGameDto.description) videoGame.description = videGameDto.description
@@ -87,10 +92,12 @@ export class VideoGameService {
       if (videGameDto.images) videoGame.images = videGameDto.images
       if (videGameDto.categoryId) categoria.id = videGameDto.categoryId
       if (videGameDto.companyId) company.id = videGameDto.companyId
-
+      if (videGameDto.consoleId) consola.id = videGameDto.consoleId
+  
       // Actualiza la asociación con la categoria y compania
       videoGame.categoria = [categoria];
       videoGame.company = company;
+      videoGame.console = consola;
       // Guarda los cambios en la base de datos.
       await this.videoGameRepository.save(videoGame);
 
