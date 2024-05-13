@@ -87,38 +87,68 @@ export class CategoryService {
   //Editar la categoria y los juegos de la categoria con dto
   async update(id: number, categoryDto: UpdateCategoryDto): Promise<Category> {
     try {
-      // Primero, verifica si la categoria existe.
+      // Primero, verifica si la categoría existe.
       const category = await this.findOne(id);
       if (!category) {
-        throw new NotFoundException(`Categoria con ID ${id} no encontrada`);
+        throw new NotFoundException(`Categoría con ID ${id} no encontrada`);
       }
-      // Verifica si videoGame existe.
-      const videoGame = await this.videoGameRepository.findOne({ where: { id: categoryDto.videoGameId } });
-      if (!videoGame) {
-        throw new NotFoundException(`Categoria con ID ${categoryDto.videoGameId} no encontrada`);
-      }
-
-
-
+  
+      // Verifica si existen videojuegos relacionados.
+          let videoGames: VideoGame[] = [];
+          if (categoryDto.videoGameId&& categoryDto.videoGameId.length > 0) {
+            videoGames = await Promise.all(
+              categoryDto.videoGameId.map(async (videGameId) => {
+                const game = await this.videoGameRepository.findOne({ where: { id: videGameId } });
+                if (!category) {
+                  throw new NotFoundException(`Categoría con ID ${videoGames} no encontrada`);
+                }
+                return game;
+              })
+            );
+          }
+  
       // Si los campos existen, actualiza los campos necesarios.
       if (categoryDto.name) category.name = categoryDto.name;
-      if (categoryDto.videoGameId) videoGame.id = categoryDto.videoGameId;
-
-      // Actualiza la asociación con videoGame
-      category.videoGame = [videoGame];
-
+  
+      // Agrega los videojuegos relacionados al array existente.
+      category.videoGame=videoGames  
       // Guarda los cambios en la base de datos.
       await this.categoryRepository.save(category);
-
+  
       return category;
     } catch (error) {
       throw new HttpException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
-        error: `Error en la actualización de la categoria: ${error.message}`,
+        error: `Error en la actualización de la categoría: ${error.message}`,
       }, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-
+/*
+  //Editar ficha video juego
+  
+      //Verificamos si la compañia existe
+  
+      // Si los campos existen, actualiza los campos necesarios.
+      if (videGameDto.name) videoGame.name = videGameDto.name;
+      if (videGameDto.description) videoGame.description = videGameDto.description;
+      if (videGameDto.qualification) videoGame.qualification = videGameDto.qualification;
+      if (videGameDto.images) videoGame.images = videGameDto.images;
+  
+      // Actualiza la asociación con las categorías y la compañía
+      videoGame.categoria = categories;
+      videoGame.company = company;
+  
+      // Guarda los cambios en la base de datos.
+      await this.videoGameRepository.save(videoGame);
+  
+      return videoGame;
+    } catch (error) {
+      throw new HttpException({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: `Error en la actualización del video juego: ${error.message}`,
+      }, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }*/
   //Eliminar una categoria
 
   async remove(id: number): Promise<Category> {

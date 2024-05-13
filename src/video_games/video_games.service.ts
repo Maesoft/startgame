@@ -54,6 +54,24 @@ export class VideoGameService {
     return videoGame;
   }
 
+  //Traer video juegos por name
+
+  //Traer video juegos por name
+  async findByCategory(name: string): Promise<VideoGame[]> {
+    const criterio: FindManyOptions = {
+        relations: ['categoria'],
+        where: {
+            categoria: {
+                name: name
+            }
+        }
+    };
+    const videoGames = await this.videoGameRepository.find(criterio);
+    if (!videoGames || videoGames.length === 0) {
+        throw new NotFoundException(`No se encontraron videojuegos para la categoría: ${name}`);
+    }
+    return videoGames;
+}
 
   //Crear ficha video juego
   async create(videoGameDto: VideoGameDto): Promise<VideoGame> {
@@ -76,24 +94,37 @@ export class VideoGameService {
       if (!videoGame) {
         throw new NotFoundException(`Video juego con ID ${id} no encontrada`);
       }
+  
       //Verificamos si la categoria existe
-      const categoria = await this.categoryRepository.findOne({ where: { id: videGameDto.categoryId } })
-      //Verificamos si la compania existe
-      const company = await this.companyRepository.findOne({ where: { id: videGameDto.companyId } })
+      let categories: Category[] = [];
+      if (videGameDto.categoryId && videGameDto.categoryId.length > 0) {
+        categories = await Promise.all(
+          videGameDto.categoryId.map(async (categoryId) => {
+            const category = await this.categoryRepository.findOne({ where: { id: categoryId } });
+            if (!category) {
+              throw new NotFoundException(`Categoría con ID ${categoryId} no encontrada`);
+            }
+            return category;
+          })
+        );
+      }
+  
+      //Verificamos si la compañia existe
+      const company = await this.companyRepository.findOne({ where: { id: videGameDto.companyId } });
+  
       // Si los campos existen, actualiza los campos necesarios.
-      if (videGameDto.name) videoGame.name = videGameDto.name
-      if (videGameDto.description) videoGame.description = videGameDto.description
-      if (videGameDto.qualification) videoGame.qualification = videGameDto.qualification
-      if (videGameDto.images) videoGame.images = videGameDto.images
-      if (videGameDto.categoryId) categoria.id = videGameDto.categoryId
-      if (videGameDto.companyId) company.id = videGameDto.companyId
-
-      // Actualiza la asociación con la categoria y compania
-      videoGame.categoria = [categoria];
+      if (videGameDto.name) videoGame.name = videGameDto.name;
+      if (videGameDto.description) videoGame.description = videGameDto.description;
+      if (videGameDto.qualification) videoGame.qualification = videGameDto.qualification;
+      if (videGameDto.images) videoGame.images = videGameDto.images;
+  
+      // Actualiza la asociación con las categorías y la compañía
+      videoGame.categoria= categories;
       videoGame.company = company;
+  
       // Guarda los cambios en la base de datos.
       await this.videoGameRepository.save(videoGame);
-
+  
       return videoGame;
     } catch (error) {
       throw new HttpException({

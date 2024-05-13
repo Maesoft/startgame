@@ -4,4 +4,4 @@ export class CreateCategoryDto {
     @IsString()
     name: string;
     @IsOptional() 
-    videoGameId?: number}
+    videoGameId?: number[]}
