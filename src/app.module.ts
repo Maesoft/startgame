@@ -10,12 +10,13 @@ import { VideoGamesModule } from './video_games/video_games.module';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
-    type: "mysql",
-    host: "localhost",
-    port: 3306,
-    username: "root",
-    password: "root",
+    type: "cockroachdb",
+    host: "startgame-14769.7tt.aws-us-east-1.cockroachlabs.cloud",
+    port: 26257,
+    username: "matias_eguia",
+    password: "awnWUsJGrdQTlEv6dSDB9Q",
     database: "startgame",
+    ssl: true,
     entities: ["dist/**/**.entity{.ts,.js}"],
     synchronize: true
 }),
