@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GamerReview</title>
+  <style>
+    .tab {
+      display: none;
+    }
+    .tab.active {
+      display: block;
+    }
+    .tab-buttons {
+      display: flex;
+    }
+    .tab-buttons button {
+      flex: 1;
+      padding: 10px;
+      cursor: pointer;
+    }
+  </style>
+  <script>
+    async function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      const response = await fetch('http://localhost:3000/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        localStorage.setItem('token', data.access_token);
+        localStorage.setItem('username', username);
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('user-info').textContent = `Logged in as: ${username}`;
+      } else {
+        alert('Login failed: ' + data.message);
+      }
+    }
+
+    function showTab(tabId) {
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    async function loadData(endpoint, data) {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please login first');
+        return;
+      }
+
+      const response = await fetch(`http://localhost:3000/${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        alert('Data loaded successfully');
+      } else {
+        const errorData = await response.json();
+        alert('Failed to load data: ' + errorData.message);
+      }
+    }
+
+    async function updateData(endpoint, data) {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please login first');
+        return;
+      }
+
+      const response = await fetch(`http://localhost:3000/${endpoint}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        alert('Data updated successfully');
+      } else {
+        const errorData = await response.json();
+        alert('Failed to update data: ' + errorData.message);
+      }
+    }
+
+    function handleCreateData(formId, endpoint) {
+      const form = document.getElementById(formId);
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      loadData(endpoint, data);
+    }
+
+    function handleUpdateData(formId, endpoint) {
+      const form = document.getElementById(formId);
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      updateData(endpoint, data);
+    }
+  </script>
+</head>
+<body>
+  <h1>Gamer Review</h1>
+  <div id="login-form">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+  </div>
+  <div id="user-info"></div>
+  <div class="tab-buttons">
+    <button onclick="showTab('tab-category')">Categoría</button>
+    <button onclick="showTab('tab-company')">Compañía</button>
+    <button onclick="showTab('tab-console')">Consola</button>
+    <button onclick="showTab('tab-videogame')">Videojuego</button>
+  </div>
+  <div id="tab-category" class="tab">
+    <h2>Crear Categoría</h2>
+    <form id="form-category-create">
+      <input type="text" name="name" placeholder="Name">
+      <input type="number" name="videoGameId" placeholder="Video Game ID">
+      <button type="button" onclick="handleCreateData('form-category-create', 'category')">Crear</button>
+    </form>
+    <h2>Actualizar Categoría</h2>
+    <form id="form-category-update">
+      <input type="number" name="id" placeholder="ID">
+      <input type="text" name="name" placeholder="Name">
+      <input type="number" name="videoGameId" placeholder="Video Game ID">
+      <button type="button" onclick="handleUpdateData('form-category-update', 'category')">Actualizar</button>
+    </form>
+  </div>
+  <div id="tab-company" class="tab">
+    <h2>Crear Compañía</h2>
+    <form id="form-company-create">
+      <input type="text" name="name" placeholder="Name">
+      <input type="text" name="siteUrl" placeholder="Site URL">
+      <input type="number" name="videoGameId" placeholder="Video Game ID (opcional)">
+      <button type="button" onclick="handleCreateData('form-company-create', 'company')">Crear</button>
+    </form>
+    <h2>Actualizar Compañía</h2>
+    <form id="form-company-update">
+      <input type="number" name="id" placeholder="ID">
+      <input type="text" name="name" placeholder="Name">
+      <input type="text" name="siteUrl" placeholder="Site URL">
+      <input type="number" name="videoGameId" placeholder="Video Game ID (opcional)">
+      <button type="button" onclick="handleUpdateData('form-company-update', 'company')">Actualizar</button>
+    </form>
+  </div>
+  <div id="tab-console" class="tab">
+    <h2>Crear Consola</h2>
+    <form id="form-console-create">
+      <input type="text" name="name" placeholder="Name">
+      <input type="number" name="year" placeholder="Year">
+      <button type="button" onclick="handleCreateData('form-console-create', 'console')">Crear</button>
+    </form>
+    <h2>Actualizar Consola</h2>
+    <form id="form-console-update">
+      <input type="number" name="id" placeholder="ID">
+      <input type="text" name="name" placeholder="Name">
+      <input type="number" name="year" placeholder="Year">
+      <button type="button" onclick="handleUpdateData('form-console-update', 'console')">Actualizar</button>
+    </form>
+  </div>
+  <div id="tab-videogame" class="tab">
+    <h2>Crear Videojuego</h2>
+    <form id="form-videogame-create">
+      <input type="text" name="name" placeholder="Name">
+      <input type="text" name="description" placeholder="Description">
+      <input type="number" name="qualification" placeholder="Qualification">
+      <input type="text" name="images" placeholder="Images">
+      <input type="number" name="categoryId" placeholder="Category ID (opcional)">
+      <input type="number" name="companyId" placeholder="Company ID (opcional)">
+      <input type="number" name="consoleId" placeholder="Console ID (opcional)">
+      <button type="button" onclick="handleCreateData('form-videogame-create', 'videogame')">Crear</button>
+    </form>
+    <h2>Actualizar Videojuego</h2>
+    <form id="form-videogame-update">
+      <input type="number" name="id" placeholder="ID">
+      <input type="text" name="name" placeholder="Name">
+      <input type="text" name="description" placeholder="Description">
+      <input type="number" name="qualification" placeholder="Qualification">
+      <input type="text" name="images" placeholder="Images">
+      <input type="number" name="categoryId" placeholder="Category ID (opcional)">
+      <input type="number" name="companyId" placeholder="Company ID (opcional)">
+      <input type="number" name="consoleId" placeholder="Console ID (opcional)">
+      <button type="button" onclick="handleUpdateData('form-videogame-update', 'videogame')">Actualizar</button>
+    </form>
+  </div>
+</body>
+</html>
