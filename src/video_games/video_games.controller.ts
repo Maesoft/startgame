@@ -5,7 +5,7 @@ import { UpdateVideoGameDto } from './dto/update-video_game.dto';
 import { VideoGame } from './entities/video_game.entity';
 import { AuthGuard } from 'src/auth/auth.guard';
 
-@Controller('video_game')
+@Controller('video_games')
 export class VideoGamesController {
   constructor(private readonly videoGamesService: VideoGameService) {}
 
