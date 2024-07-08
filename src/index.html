@@ -1,23 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Player Review</title>
+  <title>GamerReview</title>
   <style>
     .tab {
       display: none;
     }
-
     .tab.active {
       display: block;
     }
-
     .tab-buttons {
       display: flex;
     }
-
     .tab-buttons button {
       flex: 1;
       padding: 10px;
@@ -107,16 +103,17 @@
       }
     }
 
-    async function deleteData(endpoint, id) {
+    async function deleteData(endpoint) {
       const token = localStorage.getItem('token');
       if (!token) {
         alert('Please login first');
         return;
       }
 
-      const response = await fetch(`http://localhost:3000/${endpoint}/${id}`, {
+      const response = await fetch(`http://localhost:3000/${endpoint}`, {
         method: 'DELETE',
         headers: {
+          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
       });
@@ -158,13 +155,6 @@
       const formData = new FormData(form);
       const data = Object.fromEntries(formData.entries());
 
-      // Validación del año
-      const year = parseInt(data.year);
-      if (isNaN(year) || year < 1000 || year > 3000) {
-        alert('El año debe ser un número entre 1000 y 3000.');
-        return;
-      }
-
       loadData(endpoint, data);
     }
 
@@ -175,16 +165,20 @@
       updateData(endpoint, data);
     }
 
+    function handleDeleteData(id, endpoint) {
+      deleteData(`${endpoint}/${id}`);
+    }
+
     async function loadAllData() {
       const categories = await fetchData('category');
       const companies = await fetchData('company');
       const consoles = await fetchData('console');
-      const video_games = await fetchData('video_games');
+      const videogames = await fetchData('video_game');
 
       renderData('category-data', categories, 'category');
       renderData('company-data', companies, 'company');
       renderData('console-data', consoles, 'console');
-      renderData('video_games-data', video_games, 'video_games');
+      renderData('videogames-data', videogames, 'video_game');
     }
 
     function renderData(containerId, data, endpoint) {
@@ -195,16 +189,15 @@
         div.textContent = JSON.stringify(item);
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Delete';
-        deleteButton.onclick = () => deleteData(endpoint, item.id);
+        deleteButton.onclick = () => handleDeleteData(item.id, endpoint);
         div.appendChild(deleteButton);
         container.appendChild(div);
       });
     }
   </script>
 </head>
-
 <body>
-  <h1>Player Review</h1>
+  <h1>Gamer Review</h1>
   <div id="login-form">
     <h2>Login</h2>
     <input type="text" id="username" placeholder="Username">
@@ -216,7 +209,7 @@
     <button onclick="showTab('tab-category')">Categoría</button>
     <button onclick="showTab('tab-company')">Compañía</button>
     <button onclick="showTab('tab-console')">Consola</button>
-    <button onclick="showTab('tab-videogame')">Videojuegos</button>
+    <button onclick="showTab('tab-videogame')">Videojuego</button>
   </div>
   <div id="tab-category" class="tab">
     <h2>Crear Categoría</h2>
@@ -229,6 +222,7 @@
     <form id="form-category-update">
       <input type="number" name="id" placeholder="ID">
       <input type="text" name="name" placeholder="Name">
+      <input type="number" name="videoGameId" placeholder="Video Game ID">
       <button type="button" onclick="handleUpdateData('form-category-update', 'category')">Actualizar</button>
     </form>
     <h2>Categorías Existentes</h2>
@@ -257,14 +251,14 @@
     <h2>Crear Consola</h2>
     <form id="form-console-create">
       <input type="text" name="name" placeholder="Name">
-      <input type="number" name="year" placeholder="Year">
+      <input type="number" name="videoGameId" placeholder="Video Game ID (opcional)">
       <button type="button" onclick="handleCreateData('form-console-create', 'console')">Crear</button>
     </form>
     <h2>Actualizar Consola</h2>
     <form id="form-console-update">
       <input type="number" name="id" placeholder="ID">
       <input type="text" name="name" placeholder="Name">
-      <input type="number" name="year" placeholder="Year">
+      <input type="number" name="videoGameId" placeholder="Video Game ID (opcional)">
       <button type="button" onclick="handleUpdateData('form-console-update', 'console')">Actualizar</button>
     </form>
     <h2>Consolas Existentes</h2>
@@ -272,31 +266,30 @@
   </div>
   <div id="tab-videogame" class="tab">
     <h2>Crear Videojuego</h2>
-    <form id="form-videogames-create">
+    <form id="form-videogame-create">
       <input type="text" name="name" placeholder="Name">
       <input type="text" name="description" placeholder="Description">
       <input type="number" name="qualification" placeholder="Qualification">
-      <input type="text" name="images" placeholder="Images">
-      <input type="number" name="categoryId" placeholder="Category ID (opcional)">
-      <input type="number" name="companyId" placeholder="Company ID (opcional)">
-      <input type="number" name="consoleId" placeholder="Console ID (opcional)">
-      <button type="button" onclick="handleCreateData('form-videogames-create', 'videogame')">Crear</button>
+      <input type="text" name="images" placeholder="Images URL">
+      <input type="number" name="categoryId" placeholder="Category ID">
+      <input type="number" name="companyId" placeholder="Company ID">
+      <input type="number" name="consoleId" placeholder="Console ID">
+      <button type="button" onclick="handleCreateData('form-videogame-create', 'video_game')">Crear</button>
     </form>
     <h2>Actualizar Videojuego</h2>
-    <form id="form-videogames-update">
+    <form id="form-videogame-update">
       <input type="number" name="id" placeholder="ID">
       <input type="text" name="name" placeholder="Name">
       <input type="text" name="description" placeholder="Description">
       <input type="number" name="qualification" placeholder="Qualification">
-      <input type="text" name="images" placeholder="Images">
-      <input type="number" name="categoryId" placeholder="Category ID (opcional)">
-      <input type="number" name="companyId" placeholder="Company ID (opcional)">
-      <input type="number" name="consoleId" placeholder="Console ID (opcional)">
-      <button type="button" onclick="handleUpdateData('form-videogames-update', 'videogame')">Actualizar</button>
+      <input type="text" name="images" placeholder="Images URL">
+      <input type="number" name="categoryId" placeholder="Category ID">
+      <input type="number" name="companyId" placeholder="Company ID">
+      <input type="number" name="consoleId" placeholder="Console ID">
+      <button type="button" onclick="handleUpdateData('form-videogame-update', 'video_game')">Actualizar</button>
     </form>
     <h2>Videojuegos Existentes</h2>
-    <div id="videogame-data"></div>
+    <div id="videogames-data"></div>
   </div>
 </body>
-
 </html>
