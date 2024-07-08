@@ -61,10 +61,10 @@ export class VideoGameService {
   //Crear ficha video juego
   async create(videoGameDto: VideoGameDto): Promise<VideoGame> {
 
-    const videoGame = await this.videoGameRepository.save(new VideoGame(videoGameDto.name, videoGameDto.description, videoGameDto.qualification, videoGameDto.images))
+    const videoGame =  this.videoGameRepository.create(new VideoGame(videoGameDto.name, videoGameDto.description, videoGameDto.qualification, videoGameDto.images))
 
     // Guardar nuevo juego en la base de datos
-    const videoGameSave = await this.videoGameRepository.save(videoGame);
+    const videoGameSave =  this.videoGameRepository.create(videoGame);
 
     return videoGameSave;
   }

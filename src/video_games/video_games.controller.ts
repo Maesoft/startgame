@@ -11,7 +11,7 @@ export class VideoGamesController {
 
   @Post()
   @UseGuards(AuthGuard)
-  create(@Body() createVideoGameDto: VideoGameDto) {
+  async create(@Body() createVideoGameDto: VideoGameDto) {
     return this.videoGamesService.create(createVideoGameDto);
   }
 
