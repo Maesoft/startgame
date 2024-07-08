@@ -21,15 +21,15 @@ export class VideoGame {
     @Column()
     images: string
 
-    @ManyToMany(() => Category, (categoria) => categoria.videoGame)
+    @ManyToMany(() => Category, (categoria) => categoria.videoGame, { nullable: true })
     @JoinTable()
     categoria: Category[]
 
-    @ManyToOne(() => Company, (company) => company.videoGame)
+    @ManyToOne(() => Company, (company) => company.videoGame, { nullable: true })
     @JoinColumn()
     company: Company
 
-    @ManyToOne(() => Console, (console) => console.videoGame,{onDelete:'SET NULL'})
+    @ManyToOne(() => Console, (console) => console.videoGame,{ nullable: true })
     @JoinColumn()
     console: Console
 

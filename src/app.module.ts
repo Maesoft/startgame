@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { CompanyModule } from './company/company.module';
 import { CategoryModule } from './category/category.module';
 import { VideoGamesModule } from './video_games/video_games.module';
+import { DataModule } from './data/data.module';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
