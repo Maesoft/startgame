@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GamerReview</title>
+  <title>Player Review</title>
   <style>
     .tab {
       display: none;
@@ -151,17 +151,60 @@
     }
 
     async function handleCreateData(formId, endpoint) {
-      const form = document.getElementById(formId);
-      const formData = new FormData(form);
-      const data = Object.fromEntries(formData.entries());
+    const form = document.getElementById(formId);
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
 
-      loadData(endpoint, data);
+    // Convertir valores de texto a números donde sea necesario
+    if (data.qualification) data.qualification = parseFloat(data.qualification);
+    if (data.categoryId) data.categoryId = parseInt(data.categoryId);
+    if (data.companyId) data.companyId = parseInt(data.companyId);
+    if (data.consoleId) data.consoleId = parseInt(data.consoleId);
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Please login first');
+      return;
     }
 
+    const response = await fetch(`http://localhost:3000/${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (response.ok) {
+      const createdData = await response.json();
+      alert('Data created successfully');
+      loadAllData();
+
+      // Agregar el nuevo juego creado al DOM
+      const containerId = `${endpoint}-data`;
+      const container = document.getElementById(containerId);
+      renderGameData(container, createdData);
+
+      form.reset(); // Limpiar formulario después de crear
+    } else {
+      const errorData = await response.json();
+      alert('Failed to create data: ' + errorData.message);
+    }
+  }
     function handleUpdateData(formId, endpoint) {
       const form = document.getElementById(formId);
       const formData = new FormData(form);
       const data = Object.fromEntries(formData.entries());
+
+      
+      data.id = parseInt(data.id);
+      if (data.qualification) data.qualification = parseFloat(data.qualification);
+      if (data.categoryId) data.categoryId = parseInt(data.categoryId);
+      if (data.companyId) data.companyId = parseInt(data.companyId);
+      if (data.consoleId) data.consoleId = parseInt(data.consoleId);
+      if (data.year) data.year = parseInt(data.year); 
+
       updateData(endpoint, data);
     }
 
@@ -182,22 +225,22 @@
     }
 
     function renderData(containerId, data, endpoint) {
-      const container = document.getElementById(containerId);
-      container.innerHTML = '';
-      data.forEach(item => {
-        const div = document.createElement('div');
-        div.textContent = JSON.stringify(item);
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Delete';
-        deleteButton.onclick = () => handleDeleteData(item.id, endpoint);
-        div.appendChild(deleteButton);
-        container.appendChild(div);
-      });
-    }
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    data.forEach(item => {
+      const div = document.createElement('div');
+      div.textContent = JSON.stringify(item);
+      const deleteButton = document.createElement('button');
+      deleteButton.textContent = 'Delete';
+      deleteButton.onclick = () => handleDeleteData(item.id, endpoint);
+      div.appendChild(deleteButton);
+      container.appendChild(div);
+    });
+  }
   </script>
 </head>
 <body>
-  <h1>Gamer Review</h1>
+  <h1>Player Review</h1>
   <div id="login-form">
     <h2>Login</h2>
     <input type="text" id="username" placeholder="Username">
@@ -251,14 +294,14 @@
     <h2>Crear Consola</h2>
     <form id="form-console-create">
       <input type="text" name="name" placeholder="Name">
-      <input type="number" name="videoGameId" placeholder="Video Game ID (opcional)">
+      <input type="number" name="year" placeholder="Year">
       <button type="button" onclick="handleCreateData('form-console-create', 'console')">Crear</button>
     </form>
     <h2>Actualizar Consola</h2>
     <form id="form-console-update">
       <input type="number" name="id" placeholder="ID">
       <input type="text" name="name" placeholder="Name">
-      <input type="number" name="videoGameId" placeholder="Video Game ID (opcional)">
+      <input type="number" name="year" placeholder="Year">
       <button type="button" onclick="handleUpdateData('form-console-update', 'console')">Actualizar</button>
     </form>
     <h2>Consolas Existentes</h2>
@@ -293,3 +336,4 @@
   </div>
 </body>
 </html>
+
