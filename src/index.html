@@ -155,7 +155,7 @@
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
-    // Convertir valores de texto a números donde sea necesario
+
     if (data.qualification) data.qualification = parseFloat(data.qualification);
     if (data.categoryId) data.categoryId = parseInt(data.categoryId);
     if (data.companyId) data.companyId = parseInt(data.companyId);
@@ -181,12 +181,12 @@
       alert('Data created successfully');
       loadAllData();
 
-      // Agregar el nuevo juego creado al DOM
+    
       const containerId = `${endpoint}-data`;
       const container = document.getElementById(containerId);
       renderGameData(container, createdData);
 
-      form.reset(); // Limpiar formulario después de crear
+      form.reset(); 
     } else {
       const errorData = await response.json();
       alert('Failed to create data: ' + errorData.message);
