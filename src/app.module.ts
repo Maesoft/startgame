@@ -7,7 +7,8 @@ import { AuthModule } from './auth/auth.module';
 import { CompanyModule } from './company/company.module';
 import { CategoryModule } from './category/category.module';
 import { VideoGamesModule } from './video_games/video_games.module';
-import { DataModule } from './data/data.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -20,13 +21,16 @@ import { DataModule } from './data/data.module';
     ssl: true,
     entities: ["dist/**/**.entity{.ts,.js}"],
     synchronize: true
-}),
-UsersModule,
-CommentsModule,
-ConsoleModule,
-AuthModule,
-CompanyModule, 
-CategoryModule, 
-VideoGamesModule,
-]})
-export class AppModule {}
+  }),
+    UsersModule,
+    CommentsModule,
+    ConsoleModule,
+    AuthModule,
+    CompanyModule,
+    CategoryModule,
+    VideoGamesModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),]
+})
+export class AppModule { }
