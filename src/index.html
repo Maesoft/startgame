@@ -1,19 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Player Review</title>
+  <title>GamerReview</title>
   <style>
     .tab {
       display: none;
     }
+
     .tab.active {
       display: block;
     }
+
     .tab-buttons {
       display: flex;
     }
+
     .tab-buttons button {
       flex: 1;
       padding: 10px;
@@ -51,6 +55,18 @@
         tab.classList.remove('active');
       });
       document.getElementById(tabId).classList.add('active');
+    }
+
+
+    function parseFormDataToNumbers(formData) {
+      const data = Object.fromEntries(formData.entries());
+      if (data.id) data.id = parseInt(data.id);
+      if (data.qualification) data.qualification = parseFloat(data.qualification);
+      if (data.categoryId) data.categoryId = parseInt(data.categoryId);
+      if (data.companyId) data.companyId = parseInt(data.companyId);
+      if (data.consoleId) data.consoleId = parseInt(data.consoleId);
+      if (data.year) data.year = parseInt(data.year); 
+      return data;
     }
 
     async function loadData(endpoint, data) {
@@ -150,64 +166,6 @@
       }
     }
 
-    async function handleCreateData(formId, endpoint) {
-    const form = document.getElementById(formId);
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
-
-
-    if (data.qualification) data.qualification = parseFloat(data.qualification);
-    if (data.categoryId) data.categoryId = parseInt(data.categoryId);
-    if (data.companyId) data.companyId = parseInt(data.companyId);
-    if (data.consoleId) data.consoleId = parseInt(data.consoleId);
-
-    const token = localStorage.getItem('token');
-    if (!token) {
-      alert('Please login first');
-      return;
-    }
-
-    const response = await fetch(`http://localhost:3000/${endpoint}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (response.ok) {
-      const createdData = await response.json();
-      alert('Data created successfully');
-      loadAllData();
-
-    
-      const containerId = `${endpoint}-data`;
-      const container = document.getElementById(containerId);
-      renderGameData(container, createdData);
-
-      form.reset(); 
-    } else {
-      const errorData = await response.json();
-      alert('Failed to create data: ' + errorData.message);
-    }
-  }
-    function handleUpdateData(formId, endpoint) {
-      const form = document.getElementById(formId);
-      const formData = new FormData(form);
-      const data = Object.fromEntries(formData.entries());
-
-      
-      data.id = parseInt(data.id);
-      if (data.qualification) data.qualification = parseFloat(data.qualification);
-      if (data.categoryId) data.categoryId = parseInt(data.categoryId);
-      if (data.companyId) data.companyId = parseInt(data.companyId);
-      if (data.consoleId) data.consoleId = parseInt(data.consoleId);
-      if (data.year) data.year = parseInt(data.year); 
-
-      updateData(endpoint, data);
-    }
-
     function handleDeleteData(id, endpoint) {
       deleteData(`${endpoint}/${id}`);
     }
@@ -225,20 +183,73 @@
     }
 
     function renderData(containerId, data, endpoint) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = '';
-    data.forEach(item => {
-      const div = document.createElement('div');
-      div.textContent = JSON.stringify(item);
-      const deleteButton = document.createElement('button');
-      deleteButton.textContent = 'Delete';
-      deleteButton.onclick = () => handleDeleteData(item.id, endpoint);
-      div.appendChild(deleteButton);
-      container.appendChild(div);
-    });
-  }
+      const container = document.getElementById(containerId);
+      if (!container) {
+        console.error(`Container with ID ${containerId} not found`);
+        return;
+      }
+      container.innerHTML = '';
+      data.forEach(item => {
+        const div = document.createElement('div');
+        div.textContent = JSON.stringify(item);
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.onclick = () => handleDeleteData(item.id, endpoint);
+        div.appendChild(deleteButton);
+        container.appendChild(div);
+      });
+    }
+
+    async function handleCreateData(formId, endpoint) {
+      const form = document.getElementById(formId);
+      const formData = new FormData(form);
+      const data = parseFormDataToNumbers(formData);
+
+      try {
+        await loadData(endpoint, data);
+        console.log('Data posted successfully:', data);
+      } catch (error) {
+        console.error('Failed to post data:', error);
+      }
+    }
+
+    async function handleUpdateData(formId, endpoint) {
+      const form = document.getElementById(formId);
+      const formData = new FormData(form);
+      const data = parseFormDataToNumbers(formData);
+
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No hay token de autenticación');
+        }
+
+        const response = await fetch(`http://localhost:3000/${endpoint}/${data.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+          const updatedData = await response.json();
+          console.log('Data updated successfully:', updatedData);
+          alert('Data updated successfully');
+          loadAllData(); // Actualizar la interfaz después de la actualización
+        } else {
+          const errorData = await response.json();
+          throw new Error('Failed to update data: ' + errorData.message);
+        }
+      } catch (error) {
+        console.error('Failed to update data:', error);
+        alert('Failed to update data: ' + error.message);
+      }
+    }
   </script>
 </head>
+
 <body>
   <h1>Player Review</h1>
   <div id="login-form">
@@ -258,14 +269,14 @@
     <h2>Crear Categoría</h2>
     <form id="form-category-create">
       <input type="text" name="name" placeholder="Name">
-      <input type="number" name="videoGameId" placeholder="Video Game ID">
+      <input type="number" name="videoGameId" placeholder="Video Game ID (opcional)">
       <button type="button" onclick="handleCreateData('form-category-create', 'category')">Crear</button>
     </form>
     <h2>Actualizar Categoría</h2>
     <form id="form-category-update">
       <input type="number" name="id" placeholder="ID">
       <input type="text" name="name" placeholder="Name">
-      <input type="number" name="videoGameId" placeholder="Video Game ID">
+      <input type="number" name="videoGameId" placeholder="Video Game ID (opcional)">
       <button type="button" onclick="handleUpdateData('form-category-update', 'category')">Actualizar</button>
     </form>
     <h2>Categorías Existentes</h2>
@@ -299,9 +310,9 @@
     </form>
     <h2>Actualizar Consola</h2>
     <form id="form-console-update">
-      <input type="number" name="id" placeholder="ID">
       <input type="text" name="name" placeholder="Name">
       <input type="number" name="year" placeholder="Year">
+      <input type="number" name="id" placeholder="ID">
       <button type="button" onclick="handleUpdateData('form-console-update', 'console')">Actualizar</button>
     </form>
     <h2>Consolas Existentes</h2>
@@ -335,5 +346,5 @@
     <div id="videogames-data"></div>
   </div>
 </body>
-</html>
 
+</html>
