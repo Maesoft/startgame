@@ -9,7 +9,7 @@ async function bootstrap() {
 
   // Configuración de CORS
   const corsOptions: CorsOptions = {
-    origin: ['http://localhost:3000'], // Lista de orígenes permitidos
+    origin: ['http://localhost:4000'], // Lista de orígenes permitidos
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
     allowedHeaders: ['Content-Type', 'Authorization'], // Encabezados permitidos
     credentials: true, // Habilitar credenciales (cookies, encabezados de autorización)
