@@ -17,4 +17,7 @@ export class UsersService {
   public async findByUserName(username: string) {
     return await this.repositoryUser.findOneBy({ username });
   }
+  public async deleteUser(username: string) {
+    return await this.repositoryUser.delete(username)
+  }
 }

@@ -31,4 +31,11 @@ export class AuthService {
             access_token: await this.jwtService.signAsync(payload)
         }
     }
+    public async delete({ username, password }: LoginDTO) {
+        const userFound = await this.userService.findByUserName(username)
+        if (!userFound) throw new UnauthorizedException()
+        const comparePass = await bcryptjs.compare(password, userFound.password)
+        if (!comparePass) throw new UnauthorizedException()
+        return this.userService.deleteUser(username)
+    }
 }
