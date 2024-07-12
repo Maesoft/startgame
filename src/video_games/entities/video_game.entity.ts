@@ -21,7 +21,8 @@ export class VideoGame {
     @Column()
     images: string
 
-    @ManyToMany(() => Category, (categoria) => categoria.videoGame, { nullable: true })
+
+    @ManyToMany(() => Category, (categoria) => categoria.videoGame)
     @JoinTable()
     categoria: Category[]
 

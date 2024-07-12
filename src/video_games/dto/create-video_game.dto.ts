@@ -14,7 +14,7 @@ export class VideoGameDto {
     images: string;
 
     @IsOptional() 
-    categoryId: number;
+    categoryId: number[];
 
     @IsOptional() 
     companyId: number;
