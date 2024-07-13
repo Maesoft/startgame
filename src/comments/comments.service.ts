@@ -1,9 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCommentDto } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
-import { FindOneOptions, Repository } from 'typeorm';
+import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { VideoGame } from 'src/video_games/entities/video_game.entity';
 
@@ -21,8 +20,7 @@ export class CommentsService {
 
     const user = await this.repositoryUser.findOneBy({ id: userId })
     const videoGame = await this.repositoryVideoGame.findOneBy({ id: videoGameId })
-    console.log(user, videoGame);
-    
+
     if (!user || !videoGame) throw new NotFoundException("User or VideoGame not found.")
 
     const newComment = this.repositoryComments.create({
@@ -30,18 +28,27 @@ export class CommentsService {
       user,
       videoGame
     })
-
     return await this.repositoryComments.save(newComment)
-
   }
 
-  public async remove(id: string) {
-
+  public async findAllCommentsByUser(id: number) {
+    const criterio: FindManyOptions = { relations: ['user','videoGame'], where: { user: { id } } }
+    const comments = await this.repositoryComments.find(criterio)
+    if (comments.length === 0) throw new NotFoundException(`No comments found for user with ID ${id}`)
+    return comments
   }
-  public async findAllCommentsByUser(userId: string) {
-    const criterio: FindOneOptions = { relations: ['users'], where: { userId } }
-    const userFound = await this.repositoryComments.findOne(criterio)
-    if (!userFound) throw new NotFoundException
-    return userFound.comment
+
+  public async findAllCommentsByGame(id: number) {
+    const criterio: FindManyOptions = { relations: ['videoGame', 'user'], where: { videoGame: { id } } }
+    const comments = await this.repositoryComments.find(criterio)
+    if (comments.length === 0) throw new NotFoundException(`No comments found for videogame with ID ${id}`)
+    return comments
+  }
+
+  public async remove(id: number) {
+    const criterio: FindOneOptions = { where: { id } }
+    const commentFound = this.repositoryComments.findOneBy(criterio)
+    if (!commentFound) throw new NotFoundException('')
+    return this.repositoryComments.delete(criterio)
   }
 }

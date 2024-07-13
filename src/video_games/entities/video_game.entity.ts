@@ -26,11 +26,11 @@ export class VideoGame {
     @JoinTable()
     categoria: Category[]
 
-    @ManyToOne(() => Company, (company) => company.videoGame)
+    @ManyToOne(() => Company, (company) => company.videoGame, { nullable: true })
     @JoinColumn()
     company: Company
 
-    @ManyToOne(() => Console, (console) => console.videoGame)
+    @ManyToOne(() => Console, (console) => console.videoGame,{ nullable: true })
     @JoinColumn()
     console: Console
 

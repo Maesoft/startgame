@@ -8,18 +8,24 @@ export class CommentsController {
   constructor(private readonly commentsService: CommentsService) { }
 
   @Post()
-  //@UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   newComment(@Body() createCommentDto: CreateCommentDto) {
     return this.commentsService.newComment(createCommentDto);
   }
 
   @Delete(':id')
-  //@UseGuards(AuthGuard)
-  remove(@Param('id') id: string) {
+  @UseGuards(AuthGuard)
+  remove(@Param('id') id: number) {
     return this.commentsService.remove(id);
   }
-  @Get(':username')
-  findAllCommentsByUser(username: string) {
-    return this.commentsService.findAllCommentsByUser(username)
+  @Get('users/:id')
+  @UseGuards(AuthGuard)
+  findAllCommentsByUser(@Param('id') id: number) {
+    return this.commentsService.findAllCommentsByUser(id)
+  }
+  @Get('games/:id')
+  @UseGuards(AuthGuard)
+  findAllCommentsByGame(@Param('id') id: number) {
+    return this.commentsService.findAllCommentsByGame(id)
   }
 }

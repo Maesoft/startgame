@@ -1,9 +1,10 @@
-import { IS_LENGTH, IsDate, IsNumber, IsString, Length } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class CreateConsoleDto {
     @IsString()
+    @IsNotEmpty()
     name:string;
     @IsNumber()
-    @Length(4,4)
+
     year:number;
 }

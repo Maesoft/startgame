@@ -23,12 +23,12 @@ export class AuthService {
     }
     public async login({ username, password }: LoginDTO) {
         const userFound = await this.userService.findByUserName(username)
-        if (!userFound) throw new UnauthorizedException()
+        if (!userFound) throw new UnauthorizedException('Usuario y/o contraseña incorrecto.')
         const comparePass = await bcryptjs.compare(password, userFound.password)
-        if (!comparePass) throw new UnauthorizedException()
-        const payload = { sub: userFound.id, name: userFound.username, email: userFound.email }
+        if (!comparePass) throw new UnauthorizedException('Usuario y/o contraseña incorrecto.')
+        const payload = { id: userFound.id, name: userFound.username, email: userFound.email, rol: userFound.rol }
         return {
-            access_token: await this.jwtService.signAsync(payload)
+            token: await this.jwtService.signAsync(payload)
         }
     }
 }

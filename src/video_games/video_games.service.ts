@@ -1,12 +1,12 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
-import { error } from 'console';
 import { VideoGame } from './entities/video_game.entity';
 import { VideoGameDto } from './dto/create-video_game.dto';
 import { UpdateVideoGameDto } from './dto/update-video_game.dto';
 import { Category } from 'src/category/entities/category.entity';
 import { Company } from 'src/company/entities/company.entity';
+import { Console } from 'src/console/entities/console.entity';
 
 
 @Injectable()
@@ -16,7 +16,10 @@ export class VideoGameService {
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
     @InjectRepository(Company)
-    private readonly companyRepository: Repository<Company>) { }
+    private readonly companyRepository: Repository<Company>,
+    @InjectRepository(Console)
+    private readonly consoleRepository: Repository<Console>
+  ) { }
 
 
   //Traer todos sus juegos y sus relaciones
@@ -76,10 +79,10 @@ export class VideoGameService {
   //Crear ficha video juego
   async create(videoGameDto: VideoGameDto): Promise<VideoGame> {
 
-    const videoGame = await this.videoGameRepository.save(new VideoGame(videoGameDto.name, videoGameDto.description, videoGameDto.qualification, videoGameDto.images))
+    const videoGame =  this.videoGameRepository.create(new VideoGame(videoGameDto.name, videoGameDto.description, videoGameDto.qualification, videoGameDto.images))
 
     // Guardar nuevo juego en la base de datos
-    const videoGameSave = await this.videoGameRepository.save(videoGame);
+    const videoGameSave =  this.videoGameRepository.create(videoGame);
 
     return videoGameSave;
   }
