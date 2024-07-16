@@ -6,19 +6,18 @@ import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) { }
-
-    @Post('register')
-    register(@Body() registerDTO: RegisterDTO) {
-      return this.authService.register(registerDTO)
-    }
-    @Post('login')
-    login(@Body() loginDTO: LoginDTO) {
-      return this.authService.login(loginDTO)
-    }
-    @Delete()
-    @UseGuards(AuthGuard)
-    delete(@Body() loginDTO: LoginDTO) {
-      return this.authService.login(loginDTO)
-    }
+  constructor(private readonly authService: AuthService) { }
+  @Post('register')
+  register(@Body() registerDTO: RegisterDTO) {
+    return this.authService.register(registerDTO)
+  }
+  @Post('login')
+  login(@Body() loginDTO: LoginDTO) {
+    return this.authService.login(loginDTO)
+  }
+  @Delete()
+  @UseGuards(AuthGuard)
+  delete(@Body() loginDTO: LoginDTO) {
+    return this.authService.delete(loginDTO)
+  }
 }

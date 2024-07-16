@@ -5,6 +5,5 @@ export class CreateConsoleDto {
     @IsNotEmpty()
     name:string;
     @IsNumber()
-
     year:number;
 }

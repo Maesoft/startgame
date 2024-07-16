@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { RegisterDTO } from '../auth/dto/register.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { FindOneOptions, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Comment } from 'src/comments/entities/comment.entity';
 
 @Injectable()
@@ -17,7 +17,10 @@ export class UsersService {
   public async findByUserName(username: string) {
     return await this.repositoryUser.findOneBy({ username });
   }
-  public async deleteUser(username: string) {
-    return await this.repositoryUser.delete(username)
+
+  public async deleteUser(username: string) {   
+    const userFound = await this.repositoryUser.findOneBy({ username });
+    if (!userFound) throw new NotFoundException('The user does not exist.');
+    return await this.repositoryUser.delete(userFound.id)
   }
 }
