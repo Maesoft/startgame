@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateConsoleDto {
     @IsString()
@@ -6,4 +6,6 @@ export class CreateConsoleDto {
     name:string;
     @IsNumber()
     year:number;
+    @IsOptional()
+    videoGameId?: number[]
 }

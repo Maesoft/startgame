@@ -1,40 +1,165 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException,  HttpException, HttpStatus} from '@nestjs/common';
 import { CreateConsoleDto } from './dto/create-console.dto';
 import { UpdateConsoleDto } from './dto/update-console.dto';
-import { Console } from './entities/console.entity';
+import { Console } from './entities/console.entity'
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOneOptions, Repository } from 'typeorm';
+import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
+import { VideoGame } from 'src/video_games/entities/video_game.entity';
 
 
 @Injectable()
 export class ConsoleService {
-  constructor(@InjectRepository(Console) private readonly repositoryConsole: Repository<Console>) { }
+  constructor(@InjectRepository(Console) private readonly consoleRepository: Repository<Console>,
+  @InjectRepository(VideoGame)
+  private readonly videoGameRepository: Repository<VideoGame>) { }
 
-  public async newConsole(createConsoleDto: CreateConsoleDto) {
-    const consoleFound = await this.findOneByName(createConsoleDto.name)
-    if (consoleFound) throw new ConflictException('The console already exists.')
-    const newConsole: Console = this.repositoryConsole.create(createConsoleDto)
-    return await this.repositoryConsole.save(newConsole);
+  //Crear consola
+  async create(consoleDto: CreateConsoleDto): Promise<Console> {
+    try {
+      // Crear una nueva instancia de Consola con los datos del DTO
+      const console = await this.consoleRepository.save(new Console(consoleDto.name, consoleDto.year))
+
+      return console;
+    } catch (error) {
+      throw new HttpException(
+        { status: HttpStatus.NOT_FOUND, error: 'Error en la creacion de la consola' + error },
+        HttpStatus.NOT_FOUND
+      );
+    }
   }
 
-  private async findOneByName(name: string) {
-    return this.repositoryConsole.findOneBy({ name });
+  //Traer consola por name
+  async findByName(name: string): Promise<Console> {
+    try {
+      const criterio: FindOneOptions = { relations: ['videoGame'], where: { name: name } }
+      const console = await this.consoleRepository.findOne(criterio)
+      if (!console) {
+        throw new NotFoundException(`Consola con el nombre ${name} no encontrada`)
+      }
+      return console;
+    } catch (error) {
+      throw new HttpException(
+        { status: HttpStatus.NOT_FOUND, error: 'Error en la busqueda de la consola' + error },
+        HttpStatus.NOT_FOUND
+      );
+    }
+  }
+  //Traer todas las consolas y sus juegos
+  async findAll(): Promise<Console[]> {
+    try {
+      const criterio: FindManyOptions = { relations: ['videoGame'] };
+      const console: Console[] = await this.consoleRepository.find(criterio)
+
+
+      return console
+    }
+    catch (error) {
+      throw new HttpException(
+        { status: HttpStatus.NOT_FOUND, error: 'Error en la busqueda de la consola' + error },
+        HttpStatus.NOT_FOUND
+      );
+    }
   }
 
-  public async findAll() {
-    return await this.repositoryConsole.find()
+  //Traer consolas por id y su juego asociado
+  async findOne(id: number): Promise<Console> {
+    try {
+      const criterio: FindOneOptions = { relations: ['videoGame'], where: { id: id } }
+      const console = await this.consoleRepository.findOne(criterio)
+      if (!console) {
+        throw new NotFoundException(`Consola con ID ${id} no encontrada`)
+      }
+      return console;
+    }
+    catch (error) {
+      throw new HttpException(
+        { status: HttpStatus.NOT_FOUND, error: 'Error en la busqueda de la consola' + error },
+        HttpStatus.NOT_FOUND
+      );
+    }
   }
 
-  public async update(id: number, updateConsoleDto: UpdateConsoleDto) {
-    const consoleFound = await this.repositoryConsole.findOneBy({ id })
-    if(!consoleFound) throw new NotFoundException('The console does not exist.')
-    Object.assign(consoleFound.name, updateConsoleDto);
-    return await this.repositoryConsole.save(consoleFound)
+   //Editar la compania
+   async update(id: number, consoleDto: UpdateConsoleDto): Promise<Console> {
+    try {
+      // Primero, verifica si la consola existe.
+      const console = await this.findOne(id);
+      if (!console) {
+        throw new NotFoundException(`Consola con ID ${id} no encontrada`);
+      }
+     // Verifica si existen videojuegos relacionados.
+     let videoGames: VideoGame[] = [];
+     if (consoleDto.videoGameId&& consoleDto.videoGameId.length > 0) {
+       videoGames = await Promise.all(
+         consoleDto.videoGameId.map(async (videGameId) => {
+           const game = await this.videoGameRepository.findOne({ where: { id: videGameId } });
+           if (!console) {
+             throw new NotFoundException(`Console con ID ${videoGames} no encontrada`);
+           }
+           return game;
+         })
+       );
+     }
+
+
+      // Si los campos existen, actualiza los campos necesarios.
+      if (consoleDto.name) console.name = consoleDto.name;
+      if(consoleDto.year) console.year=consoleDto.year
+      // Actualiza la asociación con videoGame
+      console.videoGame = videoGames
+
+      // Guarda los cambios en la base de datos.
+      await this.consoleRepository.save(console);
+
+      return console;
+    } catch (error) {
+      throw new HttpException({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: `Error en la actualización de la consola: ${error.message}`,
+      }, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   public async remove(id: number) {
-    const consoleFound = await this.repositoryConsole.findOneBy({id})
+    const consoleFound = await this.consoleRepository.findOneBy({id})
     if(!consoleFound) throw new NotFoundException('The console does not exist.')
-    return await this.repositoryConsole.delete(consoleFound)
+    return await this.consoleRepository.delete(consoleFound)
   }
 }
+
+
+
+
+
+
+
+  //Eliminar una categoria
+
+  // async remove(id: number): Promise<Company> {
+  //   try {
+  //     // Buscar la compania por su ID
+  //     const company = await this.findOne(id);
+
+  //     if (!company) {
+  //       throw new NotFoundException(`Compania con ID ${id} no encontrada.`);
+  //     }
+
+  //     // Eliminar la asociación con videoGame
+  //     company.videoGame =null;
+
+  //     // Guardar los cambios en la base de datos
+  //     await this.companyRepository.save(company);
+
+  //     // Eliminar la compania
+  //     await this.companyRepository.remove(company);
+
+  //     return company;
+  //   } catch (error) {
+  //     throw new HttpException(
+  //       { status: HttpStatus.NOT_FOUND, error: 'Error en la eliminacion de la compania: ' + error },
+  //       HttpStatus.NOT_FOUND
+  //     );
+  //   }
+  // }
+
+

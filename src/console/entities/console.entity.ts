@@ -14,4 +14,10 @@ export class Console {
 
     @OneToMany(() => VideoGame, videogame => videogame.console,{onDelete:'SET NULL'})
     videoGame: VideoGame[]
+
+    constructor(name: string, year: number) {
+        this.name = name;
+        this.year = year;
+    }
+
 }
