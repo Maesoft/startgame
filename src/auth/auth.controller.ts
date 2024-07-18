@@ -3,6 +3,7 @@ import { RegisterDTO } from 'src/auth/dto/register.dto';
 import { AuthService } from './auth.service';
 import { LoginDTO } from './dto/login.dto';
 import { AuthGuard } from './auth.guard';
+import { ChangePasswordDTO } from './dto/changePassword.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -19,5 +20,9 @@ export class AuthController {
   @UseGuards(AuthGuard)
   delete(@Body() loginDTO: LoginDTO) {
     return this.authService.delete(loginDTO)
+  }
+  @Post('change-password')
+  changePassword(@Body() changePassword: ChangePasswordDTO) {
+    return this.authService.changePassword(changePassword)
   }
 }

@@ -4,6 +4,7 @@ import { UsersService } from 'src/users/users.service'
 import * as bcryptjs from 'bcryptjs';
 import { LoginDTO } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { ChangePasswordDTO } from './dto/changePassword.dto';
 
 @Injectable()
 export class AuthService {
@@ -38,4 +39,20 @@ export class AuthService {
         if (!comparePass) throw new UnauthorizedException()
         return this.userService.deleteUser(username)
     }
+    public async changePassword({ username, oldPassword, newPassword }: ChangePasswordDTO) {
+
+        const userFound = await this.userService.findByUserName(username);
+        if (!userFound) throw new UnauthorizedException('Usuario no encontrado.');
+
+        const comparePass = await bcryptjs.compare(oldPassword, userFound.password);
+        if (!comparePass) throw new UnauthorizedException('Contraseña antigua incorrecta');
+
+        const hashedNewPassword = await bcryptjs.hash(newPassword, 10);
+        userFound.password = hashedNewPassword;
+
+        await this.userService.updateUser(userFound.id, { password: hashedNewPassword });
+    
+        return { message: 'Contraseña modificada exitosamente.' };
+      }
 }
+

@@ -6,8 +6,6 @@ import { VideoGameDto } from './dto/create-video_game.dto';
 import { UpdateVideoGameDto } from './dto/update-video_game.dto';
 import { Category } from 'src/category/entities/category.entity';
 import { Company } from 'src/company/entities/company.entity';
-import { Console } from 'src/console/entities/console.entity';
-
 
 @Injectable()
 export class VideoGameService {
@@ -16,10 +14,7 @@ export class VideoGameService {
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
     @InjectRepository(Company)
-    private readonly companyRepository: Repository<Company>,
-    @InjectRepository(Console)
-    private readonly consoleRepository: Repository<Console>
-  ) { }
+    private readonly companyRepository: Repository<Company>) { }
 
 
   //Traer todos sus juegos y sus relaciones
@@ -79,10 +74,10 @@ export class VideoGameService {
   //Crear ficha video juego
   async create(videoGameDto: VideoGameDto): Promise<VideoGame> {
 
-    const videoGame =  this.videoGameRepository.create(new VideoGame(videoGameDto.name, videoGameDto.description, videoGameDto.qualification, videoGameDto.images))
+    const videoGame = await this.videoGameRepository.save(new VideoGame(videoGameDto.name, videoGameDto.description, videoGameDto.qualification, videoGameDto.images))
 
     // Guardar nuevo juego en la base de datos
-    const videoGameSave =  this.videoGameRepository.create(videoGame);
+    const videoGameSave = await this.videoGameRepository.save(videoGame);
 
     return videoGameSave;
   }
@@ -132,7 +127,7 @@ export class VideoGameService {
     } catch (error) {
       throw new HttpException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
-        error: `Error en la actualización del video juego: ${error.message}`,
+        error: `en la actualización del video juego: ${error.message}`,
       }, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -168,4 +163,3 @@ export class VideoGameService {
     }
   }
 }
-
