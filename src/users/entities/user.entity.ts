@@ -3,24 +3,24 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Timestamp } from "ty
 
 @Entity('users')
 export class User {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({ unique: true, length: 16 })
-    username: string;
+  @Column({ unique: true, length: 16 })
+  username: string;
 
-    @Column()
-    email: string;
+  @Column()
+  email: string;
 
-    @Column()
-    password: string;
+  @Column()
+  password: string;
 
-    @Column({ default: "user" })
-    rol: string;
+  @Column({ default: "user" })
+  rol: string;
 
-    @Column({ type: "timestamp", default: () => 'CURRENT_TIMESTAMP' })
-    create_time: Date;
+  @Column({ type: "timestamp", default: () => 'CURRENT_TIMESTAMP' })
+  create_time: Date;
 
-    @OneToMany(() => Comment, comments => comments.user)
-    comments: Comment[]
+  @OneToMany(() => Comment, comment => comment.user, { cascade: true, onDelete: 'CASCADE' })
+  comments: Comment[];
 }

@@ -25,7 +25,7 @@ async function bootstrap() {
   app.enableCors(corsOptions);
 
   // Iniciar la aplicación en el puerto 3001
-  await app.listen(3001);
+  await app.listen(3000);
 }
 
 bootstrap();
