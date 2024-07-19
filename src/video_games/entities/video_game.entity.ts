@@ -32,7 +32,7 @@ export class VideoGame {
 
     @ManyToOne(() => Console, (console) => console.videoGame,{ nullable: true })
     @JoinColumn()
-    console: Console
+    console: Console[]
 
     @OneToMany(() => Comment, (comment) => comment.videoGame)
     @JoinColumn()

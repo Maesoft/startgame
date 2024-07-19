@@ -25,7 +25,7 @@ export class VideoGameService {
   //Traer todos sus juegos y sus relaciones
   async findAll(): Promise<VideoGame[]> {
     try {
-      const criterio: FindManyOptions = { relations: ['categoria', 'company'] };
+      const criterio: FindManyOptions = { relations: ['categoria', 'company', 'console'] };
       const videoGame: VideoGame[] = await this.videoGameRepository.find(criterio)
       return videoGame
     } catch
@@ -39,7 +39,7 @@ export class VideoGameService {
 
   //Traer video juegos por id y su juego asociado
   async findOne(id: number): Promise<VideoGame> {
-    const criterio: FindOneOptions = { relations: ['categoria', 'company'], where: { id: id } }
+    const criterio: FindOneOptions = { relations: ['categoria', 'company', 'console'], where: { id: id } }
     const videoGame = await this.videoGameRepository.findOne(criterio)
     if (!videoGame) {
       throw new NotFoundException(`Video Juego con ID ${id} no encontrado`)
@@ -49,7 +49,7 @@ export class VideoGameService {
 
   //Traer video juegos por name
   async findByName(name: string): Promise<VideoGame> {
-    const criterio: FindOneOptions = { relations: ['categoria', 'company'], where: { name: name } }
+    const criterio: FindOneOptions = { relations: ['categoria', 'company', 'console'], where: { name: name } }
     const videoGame = await this.videoGameRepository.findOne(criterio)
     if (!videoGame) {
       throw new NotFoundException(`Video Juego con nombre: ${name} no encontrado`)
@@ -90,7 +90,7 @@ export class VideoGameService {
 
 
   //Editar ficha video juego
-  async update(id: number, videGameDto: UpdateVideoGameDto): Promise<VideoGame> {
+  async update(id: number, videoGameDto: UpdateVideoGameDto): Promise<VideoGame> {
     try {
       // Primero, verifica si el video juego existe.
       const videoGame = await this.findOne(id);
@@ -100,9 +100,9 @@ export class VideoGameService {
   
       //Verificamos si la categoria existe
       let categories: Category[] = [];
-      if (videGameDto.categoryId && videGameDto.categoryId.length > 0) {
+      if (videoGameDto.categoryId && videoGameDto.categoryId.length > 0) {
         categories = await Promise.all(
-          videGameDto.categoryId.map(async (categoryId) => {
+          videoGameDto.categoryId.map(async (categoryId) => {
             const category = await this.categoryRepository.findOne({ where: { id: categoryId } });
             if (!category) {
               throw new NotFoundException(`Categoría con ID ${categoryId} no encontrada`);
@@ -113,18 +113,30 @@ export class VideoGameService {
       }
   
       //Verificamos si la compañia existe
-      const company = await this.companyRepository.findOne({ where: { id: videGameDto.companyId } });
-  
+      const company = await this.companyRepository.findOne({ where: { id: videoGameDto.companyId } });
+     //Verificamos si consola existe
+       let consoles: Console[] = [];
+      if (videoGameDto.consoleId && videoGameDto.consoleId.length > 0) {
+        consoles= await Promise.all(
+          videoGameDto.consoleId.map(async (consoleId) => {
+            const console = await this.consoleRepository.findOne({ where: { id: consoleId } });
+            if (!console) {
+              throw new NotFoundException(`Consola con ID ${consoleId} no encontrada`);
+            }
+            return console;
+          })
+        );
+      }
       // Si los campos existen, actualiza los campos necesarios.
-      if (videGameDto.name) videoGame.name = videGameDto.name;
-      if (videGameDto.description) videoGame.description = videGameDto.description;
-      if (videGameDto.qualification) videoGame.qualification = videGameDto.qualification;
-      if (videGameDto.images) videoGame.images = videGameDto.images;
+      if (videoGameDto.name) videoGame.name = videoGameDto.name;
+      if (videoGameDto.description) videoGame.description = videoGameDto.description;
+      if (videoGameDto.qualification) videoGame.qualification = videoGameDto.qualification;
+      if (videoGameDto.images) videoGame.images = videoGameDto.images;
   
       // Actualiza la asociación con las categorías y la compañía
-      videoGame.categoria= categories;
+      videoGame.categoria=categories ;
       videoGame.company = company;
-  
+      videoGame.console = consoles;
       // Guarda los cambios en la base de datos.
       await this.videoGameRepository.save(videoGame);
   
@@ -153,6 +165,7 @@ export class VideoGameService {
       //Asignar un valor por defecto
       videoGame.categoria = null;
       videoGame.company = null;
+      videoGame.console = null;
       // Guardar los cambios en la base de datos
       await this.videoGameRepository.save(videoGame);
 
