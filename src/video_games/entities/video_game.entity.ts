@@ -1,8 +1,9 @@
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, ManyToOne, JoinColumn, OneToMany } from "typeorm";
 import { Category } from "src/category/entities/category.entity";
 import { Comment } from "src/comments/entities/comment.entity";
 import { Company } from "src/company/entities/company.entity";
 import { Console } from "src/console/entities/console.entity";
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, ManyToOne, JoinColumn, OneToMany } from "typeorm";
+
 @Entity('video_game')
 export class VideoGame {
 
@@ -15,28 +16,27 @@ export class VideoGame {
     @Column()
     description: string;
 
-    @Column()
-    qualification: number
+    @Column({ nullable: true })  // Permitir valores null
+    qualification: number;
 
     @Column()
-    images: string
+    images: string;
 
-
-    @ManyToMany(() => Category, (categoria) => categoria.videoGame)
+    @ManyToMany(() => Category, (category) => category.videoGame)
     @JoinTable()
-    categoria: Category[]
+    categoria: Category[];
 
     @ManyToOne(() => Company, (company) => company.videoGame, { nullable: true })
     @JoinColumn()
-    company: Company
+    company: Company;
 
-    @ManyToOne(() => Console, (console) => console.videoGame,{ nullable: true })
+    @ManyToOne(() => Console, (console) => console.videoGame, { nullable: true })
     @JoinColumn()
-    console: Console[]
+    console: Console;
 
     @OneToMany(() => Comment, (comment) => comment.videoGame)
     @JoinColumn()
-    comments: Comment[]
+    comments: Comment[];
 
     constructor(name: string, description: string, qualification: number, images: string) {
         this.name = name;
@@ -46,4 +46,3 @@ export class VideoGame {
     }
 
 }
-

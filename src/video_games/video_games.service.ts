@@ -114,19 +114,20 @@ export class VideoGameService {
   
       //Verificamos si la compañia existe
       const company = await this.companyRepository.findOne({ where: { id: videoGameDto.companyId } });
+      const console = await this.consoleRepository.findOne({ where: { id: videoGameDto.consoleId } });
      //Verificamos si consola existe
-       let consoles: Console[] = [];
-      if (videoGameDto.consoleId && videoGameDto.consoleId.length > 0) {
-        consoles= await Promise.all(
-          videoGameDto.consoleId.map(async (consoleId) => {
-            const console = await this.consoleRepository.findOne({ where: { id: consoleId } });
-            if (!console) {
-              throw new NotFoundException(`Consola con ID ${consoleId} no encontrada`);
-            }
-            return console;
-          })
-        );
-      }
+      //  let consoles: Console[] = [];
+      // if (videoGameDto.consoleId && videoGameDto.consoleId.length > 0) {
+      //   consoles= await Promise.all(
+      //     videoGameDto.consoleId.map(async (consoleId) => {
+      //       const console = await this.consoleRepository.findOne({ where: { id: consoleId } });
+      //       if (!console) {
+      //         throw new NotFoundException(`Consola con ID ${consoleId} no encontrada`);
+      //       }
+      //       return console;
+      //     })
+      //   );
+      // }
       // Si los campos existen, actualiza los campos necesarios.
       if (videoGameDto.name) videoGame.name = videoGameDto.name;
       if (videoGameDto.description) videoGame.description = videoGameDto.description;
@@ -136,7 +137,7 @@ export class VideoGameService {
       // Actualiza la asociación con las categorías y la compañía
       videoGame.categoria=categories ;
       videoGame.company = company;
-      videoGame.console = consoles;
+      videoGame.console = console;
       // Guarda los cambios en la base de datos.
       await this.videoGameRepository.save(videoGame);
   

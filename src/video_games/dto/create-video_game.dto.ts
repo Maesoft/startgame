@@ -20,5 +20,5 @@ export class VideoGameDto {
     companyId: number;
 
     @IsOptional() 
-    consoleId?: number[]
+    consoleId?: number
 }
