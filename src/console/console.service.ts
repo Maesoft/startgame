@@ -120,10 +120,31 @@ export class ConsoleService {
     }
   }
 
-  public async remove(id: number) {
-    const consoleFound = await this.consoleRepository.findOneBy({id})
-    if(!consoleFound) throw new NotFoundException('The console does not exist.')
-    return await this.consoleRepository.delete(consoleFound)
+ async remove(id: number): Promise<Console> {
+    try {
+      // Buscar la consola por su ID
+      const console = await this.findOne(id);
+
+      if (!console) {
+        throw new NotFoundException(`Consola con ID ${id} no encontrada.`);
+      }
+
+      // Eliminar la asociación con videoGame
+      console.videoGame =null;
+
+      // Guardar los cambios en la base de datos
+      await this.consoleRepository.save(console);
+
+      // Eliminar la consola
+      await this.consoleRepository.remove(console);
+
+      return console;
+    } catch (error) {
+      throw new HttpException(
+        { status: HttpStatus.NOT_FOUND, error: 'Error en la eliminacion de la consola: ' + error },
+        HttpStatus.NOT_FOUND
+      );
+    }
   }
 }
 
@@ -133,33 +154,8 @@ export class ConsoleService {
 
 
 
-  //Eliminar una categoria
+ 
 
-  // async remove(id: number): Promise<Company> {
-  //   try {
-  //     // Buscar la compania por su ID
-  //     const company = await this.findOne(id);
-
-  //     if (!company) {
-  //       throw new NotFoundException(`Compania con ID ${id} no encontrada.`);
-  //     }
-
-  //     // Eliminar la asociación con videoGame
-  //     company.videoGame =null;
-
-  //     // Guardar los cambios en la base de datos
-  //     await this.companyRepository.save(company);
-
-  //     // Eliminar la compania
-  //     await this.companyRepository.remove(company);
-
-  //     return company;
-  //   } catch (error) {
-  //     throw new HttpException(
-  //       { status: HttpStatus.NOT_FOUND, error: 'Error en la eliminacion de la compania: ' + error },
-  //       HttpStatus.NOT_FOUND
-  //     );
-  //   }
-  // }
+ 
 
 
