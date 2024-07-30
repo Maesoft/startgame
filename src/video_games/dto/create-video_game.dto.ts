@@ -7,8 +7,6 @@ export class VideoGameDto {
     @IsString()
     description: string;
 
-    @IsNumber()
-    qualification: number;
 
     @IsString()
     images: string;
@@ -20,5 +18,9 @@ export class VideoGameDto {
     companyId: number;
 
     @IsOptional() 
-    consoleId?: number
+    consoleId?: number;
+
+    @IsOptional() 
+    ratingId?: number[]
+
 }

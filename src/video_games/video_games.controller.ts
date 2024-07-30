@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, UseGuards, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put, UseGuards, NotFoundException, ParseIntPipe } from '@nestjs/common';
 import { VideoGameService } from './video_games.service';
 import { VideoGameDto } from './dto/create-video_game.dto';
 import { UpdateVideoGameDto } from './dto/update-video_game.dto';
@@ -45,7 +45,12 @@ export class VideoGamesController {
     }
   }
 
-
+  @Get(':id/average-rating')
+  async getAverageRating(@Param('id', ParseIntPipe) id: number) {
+    const videoGame = await this.videoGamesService.findOne(id);
+    const averageRating = await this.videoGamesService.getAverageRating(id); // Ajusta esto según cómo esté implementado en el servicio.
+    return { averageRating };
+  }
    @Put(':id')
    @UseGuards(AuthGuard)
   update(@Param('id') id: string, @Body() videoGameDto: VideoGameDto) {

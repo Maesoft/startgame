@@ -1,4 +1,5 @@
 import { Comment } from "src/comments/entities/comment.entity";
+import Rating from "src/raiting/entities/raiting.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Timestamp } from "typeorm";
 
 @Entity('users')
@@ -23,4 +24,6 @@ export class User {
 
   @OneToMany(() => Comment, comment => comment.user, { cascade: true, onDelete: 'CASCADE' })
   comments: Comment[];
+  @OneToMany(() => Rating, rating => rating.user, { cascade: true, onDelete: 'CASCADE' })
+  rating: Rating[];
 }

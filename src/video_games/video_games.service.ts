@@ -7,8 +7,7 @@ import { UpdateVideoGameDto } from './dto/update-video_game.dto';
 import { Category } from 'src/category/entities/category.entity';
 import { Company } from 'src/company/entities/company.entity';
 import { Console } from 'src/console/entities/console.entity';
-
-
+import Rating from 'src/raiting/entities/raiting.entity';
 @Injectable()
 export class VideoGameService {
   constructor(@InjectRepository(VideoGame)
@@ -18,14 +17,16 @@ export class VideoGameService {
     @InjectRepository(Company)
     private readonly companyRepository: Repository<Company>,
     @InjectRepository(Console)
-    private readonly consoleRepository: Repository<Console>
+    private readonly consoleRepository: Repository<Console>,
+    @InjectRepository(Rating)
+    private readonly ratingRepository: Repository<Rating>,
   ) { }
 
 
   //Traer todos sus juegos y sus relaciones
   async findAll(): Promise<VideoGame[]> {
     try {
-      const criterio: FindManyOptions = { relations: ['categoria', 'company', 'console'] };
+      const criterio: FindManyOptions = { relations: ['categoria', 'company', 'console','ratings'] };
       const videoGame: VideoGame[] = await this.videoGameRepository.find(criterio)
       return videoGame
     } catch
@@ -39,7 +40,7 @@ export class VideoGameService {
 
   //Traer video juegos por id y su juego asociado
   async findOne(id: number): Promise<VideoGame> {
-    const criterio: FindOneOptions = { relations: ['categoria', 'company', 'console'], where: { id: id } }
+    const criterio: FindOneOptions = { relations: ['categoria', 'company', 'console', 'ratings'], where: { id: id } }
     const videoGame = await this.videoGameRepository.findOne(criterio)
     if (!videoGame) {
       throw new NotFoundException(`Video Juego con ID ${id} no encontrado`)
@@ -49,7 +50,7 @@ export class VideoGameService {
 
   //Traer video juegos por name
   async findByName(name: string): Promise<VideoGame> {
-    const criterio: FindOneOptions = { relations: ['categoria', 'company', 'console'], where: { name: name } }
+    const criterio: FindOneOptions = { relations: ['categoria', 'company', 'console', 'ratings'], where: { name: name } }
     const videoGame = await this.videoGameRepository.findOne(criterio)
     if (!videoGame) {
       throw new NotFoundException(`Video Juego con nombre: ${name} no encontrado`)
@@ -75,14 +76,24 @@ export class VideoGameService {
     }
     return videoGames;
 }
+//calificaciones
+async getAverageRating(id: number): Promise<number> {
+  const videoGame = await this.findOne(id);
 
+  if (!videoGame.ratings || videoGame.ratings.length === 0) {
+    throw new NotFoundException(`No se encontraron calificaciones para el videojuego con ID ${id}`);
+  }
+
+  const total = videoGame.ratings.reduce((sum, rating) => sum + rating.value, 0);
+  return total / videoGame.ratings.length;
+}
   //Crear ficha video juego
   async create(videoGameDto: VideoGameDto): Promise<VideoGame> {
 
-    const videoGame =  this.videoGameRepository.create(new VideoGame(videoGameDto.name, videoGameDto.description, videoGameDto.qualification, videoGameDto.images))
+    const videoGame =  this.videoGameRepository.create(videoGameDto)
 
     // Guardar nuevo juego en la base de datos
-    const videoGameSave =  this.videoGameRepository.create(videoGame);
+    const videoGameSave =  this.videoGameRepository.save(videoGame);
 
     return videoGameSave;
   }
@@ -131,7 +142,6 @@ export class VideoGameService {
       // Si los campos existen, actualiza los campos necesarios.
       if (videoGameDto.name) videoGame.name = videoGameDto.name;
       if (videoGameDto.description) videoGame.description = videoGameDto.description;
-      if (videoGameDto.qualification) videoGame.qualification = videoGameDto.qualification;
       if (videoGameDto.images) videoGame.images = videoGameDto.images;
   
       // Actualiza la asociación con las categorías y la compañía

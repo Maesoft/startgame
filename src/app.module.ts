@@ -9,6 +9,7 @@ import { CategoryModule } from './category/category.module';
 import { VideoGamesModule } from './video_games/video_games.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import {RaitingModule} from './raiting/raiting.module';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -29,6 +30,7 @@ import { join } from 'path';
     CompanyModule,
     CategoryModule,
     VideoGamesModule,
+    RaitingModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),]
