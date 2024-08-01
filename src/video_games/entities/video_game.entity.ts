@@ -23,7 +23,8 @@ export class VideoGame {
     @ManyToMany(() => Category, (category) => category.videoGame)
     @JoinTable()
     categoria: Category[];
-
+    @Column({ type: 'float', default: 0 })  // Nueva columna para la calificación media
+    averageRating: number;
     @ManyToOne(() => Company, (company) => company.videoGame, { nullable: true })
     @JoinColumn()
     company: Company;

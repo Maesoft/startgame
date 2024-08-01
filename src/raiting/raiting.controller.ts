@@ -15,7 +15,7 @@ export class RatingController {
   // Endpoint para obtener calificaciones de un videojuego específico
   @Get('video-game/:videoGameId')
   async getRatingsByVideoGame(@Param('videoGameId') videoGameId: number): Promise<Rating[]> {
-    return this.ratingService.findByVideoGame(videoGameId);
+      return this.ratingService.findByVideoGame(videoGameId);
   }
 
   // Endpoint para obtener la calificación promedio de un videojuego específico

@@ -14,16 +14,43 @@ export class RatingService {
     private readonly videoGameRepository: Repository<VideoGame>,
   ) {}
 
+
   async create(createRatingDto: CreateRatingDto): Promise<Rating> {
-    const videoGame = await this.videoGameRepository.findOne({where:{id:createRatingDto.videoGameId}});
+    const videoGame = await this.videoGameRepository.findOne({
+        where: { id: createRatingDto.videoGameId }
+    });
+
     if (!videoGame) {
-      throw new NotFoundException(`Videojuego con ID ${createRatingDto.videoGameId} no encontrado`);
+        throw new NotFoundException(`VideoGame with ID ${createRatingDto.videoGameId} not found`);
     }
-    
-    const rating = this.ratingRepository.create(createRatingDto);
-    return this.ratingRepository.save(rating);
+
+    const rating = this.ratingRepository.create({
+        ...createRatingDto,
+        videoGame
+    });
+
+    const savedRating = await this.ratingRepository.save(rating);
+
+    // Actualiza la calificación media después de guardar la calificación
+    await this.updateAverageRating(videoGame.id);
+
+    return savedRating;
+}
+async updateAverageRating(videoGameId: number): Promise<void> {
+  const ratings = await this.ratingRepository.find({
+      where: { videoGame: { id: videoGameId } }
+  });
+
+  if (ratings.length === 0) {
+      await this.videoGameRepository.update(videoGameId, { averageRating: 0 });
+      return;
   }
 
+  const total = ratings.reduce((sum, rating) => sum + rating.value, 0);
+  const averageRating = total / ratings.length;
+
+  await this.videoGameRepository.update(videoGameId, { averageRating });
+}
   async findByVideoGame(videoGameId: number): Promise<Rating[]> {
     const ratings = await this.ratingRepository.find({ where: { videoGame: { id: videoGameId } } });
     if (!ratings.length) {
