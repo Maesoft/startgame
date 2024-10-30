@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/style-dashboard.css">
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Admin Dashboard</h1>
+
+        <div class="section">
+            <h2>Cargar Videojuego</h2>
+            <form id="videojuegoForm">
+                <div class="form-group">
+                    <label for="name">Nombre</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Descripción</label>
+                    <textarea id="description" name="description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="qualification">Calificación</label>
+                    <input type="number" id="qualification" name="qualification" min="1" max="10" required>
+                </div>
+                <div class="form-group">
+                    <label for="images">Imágenes</label>
+                    <input type="file" id="images" name="images" multiple required>
+                </div>
+                <div class="form-group">
+                    <button type="submit">Cargar Videojuego</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="section">
+            <h2>Categorías</h2>
+            <form id="categoriaForm">
+                <div class="form-group">
+                    <label for="categoriaName">Nombre de la Categoría</label>
+                    <input type="text" id="categoriaName" name="categoriaName" required>
+                </div>
+                <div class="form-group">
+                    <label for="videojuegos">Videojuegos</label>
+                    <input type="text" id="videojuegos" name="videojuegos" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit">Agregar Categoría</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="section">
+            <h2>Consolas</h2>
+            <form id="consolaForm">
+                <div class="form-group">
+                    <label for="consolaName">Nombre de la Consola</label>
+                    <input type="text" id="consolaName" name="consolaName" required>
+                </div>
+                <div class="form-group">
+                    <label for="year">Año</label>
+                    <input type="number" id="year" name="year" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit">Agregar Consola</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

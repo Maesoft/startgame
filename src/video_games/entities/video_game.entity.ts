@@ -16,9 +16,6 @@ export class VideoGame {
     description: string;
 
     @Column()
-    qualification: number
-
-    @Column()
     images: string
 
 
@@ -41,7 +38,6 @@ export class VideoGame {
     constructor(name: string, description: string, qualification: number, images: string) {
         this.name = name;
         this.description = description;
-        this.qualification = qualification;
         this.images = images;
     }
 

@@ -113,7 +113,6 @@ export class VideoGameService {
       // Si los campos existen, actualiza los campos necesarios.
       if (videGameDto.name) videoGame.name = videGameDto.name;
       if (videGameDto.description) videoGame.description = videGameDto.description;
-      if (videGameDto.qualification) videoGame.qualification = videGameDto.qualification;
       if (videGameDto.images) videoGame.images = videGameDto.images;
   
       // Actualiza la asociación con las categorías y la compañía
